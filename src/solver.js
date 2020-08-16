@@ -1,5 +1,3 @@
-let Ti = new Date().getTime() / 1000;
-
 let lines = `Grid 03
 000000907
 000420180
@@ -27,13 +25,25 @@ async function solve(grid) {
 
     let path = [];
     let current = 0;
+    let cycles = 0;
     Global:
     while (true) {
         if (path.length == zeroes.length) break Global;
+        cycles++;
 
         let time = document.getElementById("speed").value;
-        await sleep(time);
-        redraw();
+        time = logslider(time);
+        if (time >= 1) {
+            await sleep(time);
+            redraw();
+        }
+        else {
+            let interval = Math.ceil(1 / time);
+            if (cycles % interval == 0) {
+                await sleep(1);
+                redraw();
+            }
+        }
 
         if (path[current] != undefined) {
             for (let i = path[current]; i < 10; i++) {
@@ -127,5 +137,15 @@ function createGrid(data) {
     return grid;
 }
 
-let Tf = new Date().getTime() / 1000;
-console.log(Tf - Ti);
+function logslider(pos) {
+    var minp = 1;
+    var maxp = 500;
+
+    var minv = Math.log(50);
+    var maxv = Math.log(0.01);
+  
+    // calculate adjustment factor
+    var scale = (maxv-minv) / (maxp-minp);
+  
+    return Math.exp(minv + scale*(pos-minp));
+  }
